@@ -8,6 +8,8 @@
 //Engine imports
 #include "Engine/World.h"
 
+
+
 // Sets default values for this component's properties
 UOpenDoor::UOpenDoor()
 {
@@ -49,10 +51,10 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 void UOpenDoor::OpenDoor()
 {
-	owner->SetActorRotation(FRotator(0.0f, OpenAngle, 0.0f));
+	owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, OpenAngle, 0.0f)), 0.06f));
 }
 
 void UOpenDoor::CloseDoor()
 {
-	owner->SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
+	owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, 90.0f, 0.0f)), 0.05f));
 }
