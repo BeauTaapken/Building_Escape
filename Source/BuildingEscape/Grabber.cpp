@@ -1,10 +1,12 @@
 // Copyright Beau Taapken 2019
 
-//GameFramework imports
+///Components imports
+#include "Components/PrimitiveComponent.h"
+///GameFramework imports
 #include "GameFramework/PlayerController.h"
-//Engine imports
+///Engine imports
 #include "Engine/World.h"
-//Other header file imports
+///Other header file imports
 #include "Grabber.h"
 
 #define OUT
@@ -66,8 +68,21 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	FVector playerViewPointLocation;
+	FRotator playerViewPointRotation;
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT playerViewPointLocation,
+		OUT playerViewPointRotation
+	);
+
+	FVector lineTraceEnd = playerViewPointLocation + playerViewPointRotation.Vector() * reach;
+	
 	//If the physics handle is attached
+	if(physicsHandle->GrabbedComponent)
+	{
 		//Move the object that we're holding
+		physicsHandle->SetTargetLocation(lineTraceEnd);
+	}
 }
 
 void UGrabber::Grab()
@@ -75,10 +90,21 @@ void UGrabber::Grab()
 	UE_LOG(LogTemp, Warning, TEXT("in grab"));
 
 	///Line trace and see if we reach any actors with physics body collision channel set
-	GetFirstPhysicsBodyInReach();
+	FHitResult hitResult = GetFirstPhysicsBodyInReach();
+	auto ComponentToGrab = hitResult.GetComponent();
+	auto actorHit = hitResult.GetActor();
 	
 	///If we hit something then attach a physics handle
-		//TODO attach physics handle
+	if(actorHit)
+	{
+		//GrabComponentAtLocationWithRotation is used instead of GrabComponentAtLocation because rotation of the objects needs to be locked
+		physicsHandle->GrabComponentAtLocationWithRotation(
+			ComponentToGrab,
+			NAME_None,
+			ComponentToGrab->GetComponentLocation(),
+			ComponentToGrab->GetComponentRotation()
+		);
+	}
 }
 
 void UGrabber::Release()
@@ -86,6 +112,7 @@ void UGrabber::Release()
 	UE_LOG(LogTemp, Warning, TEXT("dropped"));
 
 	//TODO release physics handle
+	physicsHandle->ReleaseComponent();
 }
 
 ///Get player viewpoint this tick
@@ -121,5 +148,5 @@ const FHitResult UGrabber::GetFirstPhysicsBodyInReach()
 		UE_LOG(LogTemp, Error, TEXT("LineTrace hit: %s"), *hitResultActor->GetName());
 	}
 	
-	return FHitResult();
+	return hitResult;
 }
