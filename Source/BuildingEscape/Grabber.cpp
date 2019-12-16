@@ -38,6 +38,20 @@ void UGrabber::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("No physicshandle has been found on object %s"), *GetOwner()->GetName())
 	}
+
+	//Look for attached input component(only appears at runtime)
+	inputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (inputComponent)
+	{
+		//inputComponent is found
+		UE_LOG(LogTemp, Warning, TEXT("Inputcomponent has been found on object %s"), *GetOwner()->GetName())
+			///Bind the input axis
+			inputComponent->BindAction("Grab", IE_Pressed, this, &UGrabber::Grab);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("No inputcomponent has been found on object %s"), *GetOwner()->GetName())
+	}
 }
 
 
@@ -53,9 +67,6 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		OUT playerViewPointLocation,
 		OUT playerViewPointRotation
 	);
-	//Log out to test
-	/*UE_LOG(LogTemp, Error, TEXT("PlayerViewPointLocation: %s"), *playerViewPointLocation.ToString());
-	UE_LOG(LogTemp, Error, TEXT("PlayerViewPointRotation: %s"), *playerViewPointRotation.ToString());*/
 
 	FVector lineTraceEnd = playerViewPointLocation + playerViewPointRotation.Vector() * reach;
 
@@ -93,3 +104,7 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	}
 }
 
+void UGrabber::Grab()
+{
+	UE_LOG(LogTemp, Warning, TEXT("in grab"));
+}

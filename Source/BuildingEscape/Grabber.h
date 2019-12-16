@@ -30,4 +30,9 @@ private:
 	float reach = 100.0f;
 
 	UPhysicsHandleComponent* physicsHandle = nullptr;
+
+	UInputComponent* inputComponent = nullptr;
+
+	//Ray-cast and grab what's in reach
+	void Grab();
 };
