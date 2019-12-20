@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 //Engine imports
 #include "Engine/World.h"
+//Components imports
+#include "Components/PrimitiveComponent.h"
 
 #define OUT
 
@@ -35,11 +37,14 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//Poll the Trigger volume
-	if(GetTotalMassOfActorsOnPlate() > 50.0f)//TODO change into parameter
-	{
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
-	}
+	//if(PressurePlate)
+	//{
+		if (PressurePlate && GetTotalMassOfActorsOnPlate() > neededWeight)
+		{
+			OpenDoor();
+			LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		}
+	//}
 
 	//Check if door has to be closed
 	if(GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
@@ -56,6 +61,11 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 	TArray<AActor*> overlappingActors;
 	PressurePlate->GetOverlappingActors(OUT overlappingActors);
 	//Iterate through them adding masses
+	for(const auto* Actor : overlappingActors)
+	{
+		totalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
+		UE_LOG(LogTemp, Warning, TEXT("%s on pressure plate"), *Actor->GetName())
+	}
 	
 	return totalMass;
 }
