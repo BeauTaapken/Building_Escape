@@ -31,6 +31,12 @@ public:
 private:
 	UPROPERTY(EditAnywhere)
 	float OpenAngle = 90.0f;
+
+	UPROPERTY(EditAnywhere)
+	bool SlidingDoor;
+
+	UPROPERTY(EditAnywhere)
+	FVector SlidingDoorLerpLocation;
 	
 	UPROPERTY(EditAnywhere)
 	ATriggerVolume* PressurePlate;
@@ -39,17 +45,15 @@ private:
 	float DoorCloseDelay = 1.0f;
 
 	UPROPERTY(EditAnywhere)
-	float neededWeight = 50.0f;
+	float NeededWeight = 50.0f;
 
 	float LastDoorOpenTime;
+
+	FVector DefaultLocation;
 	
 	//Owning door
 	AActor* owner;
 
 	//Returns total mass in kg
-	float GetTotalMassOfActorsOnPlate();
-	
-//Public values to edit here
-public:
-	
+	float GetTotalMassOfActorsOnPlate();	
 };

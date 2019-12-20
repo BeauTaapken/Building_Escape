@@ -28,6 +28,12 @@ void UOpenDoor::BeginPlay()
 	Super::BeginPlay();
 
 	owner = GetOwner();
+	if(!PressurePlate)
+	{
+		UE_LOG(LogTemp, Error, TEXT("%s doesn't have a pressure plate selected"), *owner->GetName());
+	}
+
+	DefaultLocation = owner->GetActorLocation();
 }
 
 
@@ -37,14 +43,11 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	//Poll the Trigger volume
-	//if(PressurePlate)
-	//{
-		if (PressurePlate && GetTotalMassOfActorsOnPlate() > neededWeight)
-		{
-			OpenDoor();
-			LastDoorOpenTime = GetWorld()->GetTimeSeconds();
-		}
-	//}
+	if (PressurePlate && GetTotalMassOfActorsOnPlate() > NeededWeight)
+	{
+		OpenDoor();
+		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+	}
 
 	//Check if door has to be closed
 	if(GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
@@ -64,7 +67,7 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 	for(const auto* Actor : overlappingActors)
 	{
 		totalMass += Actor->FindComponentByClass<UPrimitiveComponent>()->GetMass();
-		UE_LOG(LogTemp, Warning, TEXT("%s on pressure plate"), *Actor->GetName())
+		UE_LOG(LogTemp, Warning, TEXT("%s on pressure plate"), *Actor->GetName());
 	}
 	
 	return totalMass;
@@ -72,10 +75,24 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 
 void UOpenDoor::OpenDoor()
 {
-	owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, OpenAngle, 0.0f)), 0.06f));
+	if(SlidingDoor)
+	{
+		owner->SetActorLocation(FMath::Lerp(owner->GetActorLocation(), SlidingDoorLerpLocation, 0.06f));
+	}
+	else
+	{
+		owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, OpenAngle, 0.0f)), 0.06f));
+	}
 }
 
 void UOpenDoor::CloseDoor()
 {
-	owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, 90.0f, 0.0f)), 0.05f));
+	if (SlidingDoor)
+	{
+		owner->SetActorLocation(FMath::Lerp(owner->GetActorLocation(), DefaultLocation, 0.06f));
+	}
+	else
+	{
+		owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, 90.0f, 0.0f)), 0.05f));
+	}
 }
