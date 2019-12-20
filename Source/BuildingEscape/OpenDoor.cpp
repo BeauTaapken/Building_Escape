@@ -32,8 +32,6 @@ void UOpenDoor::BeginPlay()
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s doesn't have a pressure plate selected"), *owner->GetName());
 	}
-
-	DefaultLocation = owner->GetActorLocation();
 }
 
 
@@ -46,14 +44,13 @@ void UOpenDoor::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	//Poll the Trigger volume
 	if (GetTotalMassOfActorsOnPlate() > NeededWeight)
 	{
-		OpenDoor();
-		LastDoorOpenTime = GetWorld()->GetTimeSeconds();
+		OnOpen.Broadcast();
 	}
 
 	//Check if door has to be closed
-	if(GetWorld()->GetTimeSeconds() - LastDoorOpenTime > DoorCloseDelay)
+	else
 	{
-		CloseDoor();
+		OnClose.Broadcast();
 	}
 }
 
@@ -74,29 +71,4 @@ float UOpenDoor::GetTotalMassOfActorsOnPlate()
 	}
 	
 	return totalMass;
-}
-
-void UOpenDoor::OpenDoor()
-{
-	if(SlidingDoor)
-	{
-		owner->SetActorLocation(FMath::Lerp(owner->GetActorLocation(), SlidingDoorLerpLocation, 0.06f));
-	}
-	else
-	{
-		//owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, OpenAngle, 0.0f)), 0.06f));
-		OnOpenRequest.Broadcast();
-	}
-}
-
-void UOpenDoor::CloseDoor()
-{
-	if (SlidingDoor)
-	{
-		owner->SetActorLocation(FMath::Lerp(owner->GetActorLocation(), DefaultLocation, 0.06f));
-	}
-	else
-	{
-		owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, 90.0f, 0.0f)), 0.05f));
-	}
 }
