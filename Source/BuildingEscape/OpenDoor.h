@@ -39,7 +39,7 @@ private:
 	FVector SlidingDoorLerpLocation;
 	
 	UPROPERTY(EditAnywhere)
-	ATriggerVolume* PressurePlate;
+	ATriggerVolume* PressurePlate = nullptr;
 
 	UPROPERTY(EditAnywhere)
 	float DoorCloseDelay = 1.0f;
@@ -52,7 +52,7 @@ private:
 	FVector DefaultLocation;
 	
 	//Owning door
-	AActor* owner;
+	AActor* owner = nullptr;
 
 	//Returns total mass in kg
 	float GetTotalMassOfActorsOnPlate();	
