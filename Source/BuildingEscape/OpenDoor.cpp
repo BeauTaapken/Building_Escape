@@ -84,7 +84,8 @@ void UOpenDoor::OpenDoor()
 	}
 	else
 	{
-		owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, OpenAngle, 0.0f)), 0.06f));
+		//owner->SetActorRotation(FMath::Lerp(FQuat(owner->GetActorRotation()), FQuat(FRotator(0.0f, OpenAngle, 0.0f)), 0.06f));
+		OnOpenRequest.Broadcast();
 	}
 }
 
