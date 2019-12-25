@@ -23,7 +23,7 @@ void UPositionReport::BeginPlay()
 	FString ownerName = GetOwner()->GetName();
 	FString ownerLocation = GetOwner()->GetActorLocation().ToString();
 	
-	UE_LOG(LogTemp, Error, TEXT("%s at position %s"), *ownerName, *ownerLocation);
+	UE_LOG(LogTemp, Warning, TEXT("%s at position %s"), *ownerName, *ownerLocation);
 }
 
 
